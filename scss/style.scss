@@ -1,0 +1,94 @@
+/*
+    Theme Name:     Nucleus
+    Theme URI:      http://vtldesign.com
+    Description:    A blank WordPress theme
+    Version:        1.0
+    Author:         Vital
+    Author URI:     http://vtldesign.com
+*/
+
+@import "base";
+
+/* --------------------------------------------------------------------------
+
+    TABLE OF CONTENTS
+
+    1. Normalize & Global
+
+/*  ==========================================================================
+     1. RESET & GLOBAL
+    ==========================================================================  */
+
+@import "normalize";
+
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+body {
+  background: color(body-bg);
+  color: color(text-color);
+  font-family: "Source Code Pro", sans-serif;
+  font-weight:300;
+  -webkit-font-smoothing: antialiased;
+  -moz-font-smoothing: grayscale;
+}
+
+h1, h2 {
+  font-weight:300;
+}
+
+.container {
+  max-width:64em;
+  padding: 1.5em;
+  margin: 0 auto;
+  height: 100%;
+}
+
+canvas {
+  
+  &.playing:hover {
+    cursor: none;
+  }
+}
+
+.controls {
+  margin-top: 2.5em;
+  text-align:center;
+}
+
+header {
+  
+  .not-supported {
+    background: color(text-color);
+    color: color(body-bg);
+    padding: 10px 0;
+    text-indent: 10px;
+  }
+}
+
+.button {
+  position: relative;
+  top:0;
+  color: color(text-color);
+  background: color(body-bg);
+  font-size: 2em;
+  padding: 0.5em;
+  box-shadow:  0px 6px 0px darken(color(body-bg), 10%), 0px 6px 25px rgba(black, 0.7);
+  transition: all .1s ease-in-out;
+  
+  &:active {
+    box-shadow:  0px 3px 0px darken(color(body-bg), 10%), 0px 3px 6px rgba(black, 0.7);
+    top:6px;
+  }
+  
+  & + & {
+    margin-left:0.33em;
+  }
+}
+
+.status {
+  margin-top: 1.5em;
+  text-align:center;
+}

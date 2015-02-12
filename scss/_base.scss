@@ -1,0 +1,97 @@
+@import "node_modules/susy/sass/susy";
+@import "custom";
+
+// /*  ==========================================================================
+//      CUSTOM VARIABLES
+//     ==========================================================================  */
+
+$image-path: 'images/';
+$icon-path: 'images/icons/';
+
+// /*  ==========================================================================
+//      BREAKPOINTS
+//     ==========================================================================  */
+
+$smallest: pxtoem(480px);
+$small: pxtoem(600px);
+$medium: pxtoem(760px);
+$large: pxtoem(1000px);
+$x-large: pxtoem(1280px);
+$xx-large: pxtoem(1400px);
+
+$breakpoints: (
+	smallest: $smallest,
+	small: $small,
+	medium: $medium,
+	large: $large,
+	x-large: $x-large,
+	xx-large: $x-large
+);
+
+@mixin respond-to($breakpoint) {
+    @if map-has-key($breakpoints, $breakpoint) {
+        @media (min-width: #{map-get($breakpoints, $breakpoint)}) {
+            @content;
+        }
+    }
+    @else {
+        @warn "That variable doesn't exist in '#{$breakpoint}' dummy"
+        + "Add it to '$breakpoints' map, or GTFO.";
+    }
+}
+
+// /*  ==========================================================================
+//      Z-INDEX MAP
+//     ==========================================================================  */
+
+$z-index: (
+
+);
+
+@function z-index($key) {
+    @if map-has-key($z-index, $key) {
+        @return map-get($z-index, $key);
+    }
+
+    @warn "Unkown '#{$key}' in $z-index.";
+    @return null;
+}
+
+// /*  ==========================================================================
+//      COLOR DEFINITIONS AND MAP
+//     ==========================================================================  */
+
+$colors: (
+  body-bg: #181818,
+  text-color: #3cfd2a,
+  container-border: lighten(black, 25%),
+  element-bg: skyblue
+);
+
+@function color($key) {
+    @if map-has-key($colors, $key) {
+        @return map-get($colors, $key);
+    }
+
+    @warn "Unkown '#{$key}' in $colors.";
+    @return null;
+}
+
+
+// /*  ==========================================================================
+//      FONT STACKS
+//     ==========================================================================  */
+
+// Example: font-family: map-get($fonts, base);
+$fonts: (
+    base: "'Helvetica Neue', Helvetica, Arial, sans-serif"
+);
+
+@function font($key) {
+    @if map-has-key($fonts, $key) {
+        @return map-get($fonts, $key);
+    }
+
+    @warn "Unkown '#{$key}' in $fonts.";
+    @return null;
+}
