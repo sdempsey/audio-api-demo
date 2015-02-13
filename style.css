@@ -360,6 +360,9 @@ canvas.playing:hover {
 .controls {
   margin-top: 2.5em;
   text-align: center; }
+  .controls.loading {
+    opacity: 0.7;
+    pointer-events: none; }
 
 header .not-supported {
   background: #3cfd2a;
@@ -385,4 +388,31 @@ header .not-supported {
 .status {
   margin-top: 1.5em;
   text-align: center; }
+
+#audio-status:before, #audio-status:after {
+  content: '';
+  display: inline-block;
+  width: 5px; }
+
+span.loading, span.ready {
+  -webkit-animation: loading 0.5s infinite alternate;
+          animation: loading 0.5s infinite alternate; }
+
+@-webkit-keyframes loading {
+  from {
+    background: #3cfd2a;
+    color: #181818; }
+
+  to {
+    background: #181818;
+    color: #3cfd2a; } }
+
+@keyframes loading {
+  from {
+    background: #3cfd2a;
+    color: #181818; }
+
+  to {
+    background: #181818;
+    color: #3cfd2a; } }
 /*# sourceMappingURL=style.css.map */

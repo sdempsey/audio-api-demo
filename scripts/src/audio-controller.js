@@ -1,25 +1,21 @@
-audioController = (function($) {
+(function($) {
 	var context, source, soundSource, soundUrl,
 		play, stop, pause, sound,
 		win, doc, audioStatus,
 		notSupported, canvas,
-		analyser, stream;
+		analyser, stream, controls;
 
 	function onDocumentReady() {
 		win = $(window);
-		doc = $(document);
-		soundUrl = SiteInfo.homeUrl + '/wp-content/themes/audio/mp3/odd-look.mp3';
+		soundUrl = '//katiebaca.com/tutorial/odd-look.mp3';
+		notSupported = document.getElementById('not-supported');
+		audioStatus = document.getElementById('audio-status');
+		controls = $(document.getElementById('controls'));
+		canvas = document.getElementById('visualizer');
+		canvasContext = canvas.getContext('2d');
 		play = $(document.getElementById('play'));
 		pause = $(document.getElementById('pause'));
 		stop = $(document.getElementById('stop'));
-		notSupported = document.getElementById('not-supported');
-		audioStatus = document.getElementById('audio-status');
-		canvas = document.getElementById('visualizer');
-		canvasCtx = canvas.getContext('2d');
-
-		window.AudioContext = window.AudioContext || window.webkitAudioContext;
-  		context = new AudioContext();
-	    analyser = context.createAnalyser();
 
   		init();
 
@@ -36,9 +32,16 @@ audioController = (function($) {
 	function init(callback) {
 		try {
 			window.AudioContext = window.AudioContext || window.webkitAudioContext;
-			context = new AudioContext();
+  			context = new AudioContext();
+	    	analyser = context.createAnalyser();
+			analyser.minDecibels = -90;
+			analyser.maxDecibels = -10;	    
+			analyser.smoothingTimeConstant = 0.85;
 			loadSound(soundUrl);
-			audioStatus.innerHTML = "Ready";
+			audioStatus.innerHTML = " Loading Audio ";
+			audioStatus.className = "loading";
+			controls.addClass("loading");
+
 		} catch(e) {
 			// API not supported
 			notSupported.className = "not-supported";
@@ -50,7 +53,7 @@ audioController = (function($) {
 		}
 	}
 
-	function loadSound(url, complete) {
+	function loadSound(url) {
 		var request = new XMLHttpRequest();
 		request.open('GET', url, true);
 		request.responseType = 'arraybuffer';
@@ -59,7 +62,12 @@ audioController = (function($) {
 			// request.response is encoded... so decode it now
 			context.decodeAudioData(request.response, function(buffer) {
 				sound = buffer;
-				console.log('successfully loaded: ' + url.split('/')[8]);
+				audioStatus.innerHTML = "Ready!";
+				audioStatus.className = "ready";
+				controls.removeClass("loading");
+				setTimeout(function() {
+					audioStatus.className = "";
+				}, 1500);
 			}, function(err) {
 					notSupported.className = "not-supported";
     				notSupported.innerHTML = "Failed to Load Sound - Check the console";
@@ -77,23 +85,28 @@ audioController = (function($) {
 	}
 
 	function playSound(buffer) {
-	    soundSource = context.createBufferSource();
-	    soundSource.buffer = buffer;		
-		source = context.createMediaStreamSource(sound);
-		source.conect(analyser);
-		analyser.connect(context.destination);
-	    // source = context.createMediaElementSource(sound);
-	    // source.connect(analyser);
- 		// analyser.connect(context.destination);
-	    // source.start(0);
-	    // visualize();
-	    // audioStatus.innerHTML = "Playing";
+		if (audioStatus.innerHTML === "Paused") {
+			audioStatus.innerHTML = "Playing";
+			source.connect(analyser);
+			return false;
+		}
+
+		if (audioStatus.innerHTML === "Playing") {
+			return false;
+		}
+	    source = context.createBufferSource();
+	    source.buffer = buffer;	
+	    analyser.connect(context.destination);
+		source.connect(analyser);
+		source.start();
+	    visualize();
+	    audioStatus.innerHTML = "Playing";
 	}
 
 	function pauseSound() {
 		if (audioStatus.innerHTML != "Paused") {
 			audioStatus.innerHTML = "Paused";
-			source.stop(0);
+			source.disconnect(analyser);
 		}
 		
 	}
@@ -111,7 +124,7 @@ audioController = (function($) {
 		var bufferLength = analyser.frequencyBinCount; // half the FFT value
 		var dataArray = new Uint8Array(bufferLength); // create an array to store the data
 
-		canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
+		canvasContext.clearRect(0, 0, WIDTH, HEIGHT);
 
 		function draw() {
 
@@ -119,13 +132,13 @@ audioController = (function($) {
 
 			analyser.getByteTimeDomainData(dataArray); // get waveform data and put it into the array created above
 
-			canvasCtx.fillStyle = '#181818'; // draw wave with canvas
-			canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+			canvasContext.fillStyle = '#181818'; // draw wave with canvas
+			canvasContext.fillRect(0, 0, WIDTH, HEIGHT);
 
-			canvasCtx.lineWidth = 2;
-			canvasCtx.strokeStyle = '#3cfd2a';
+			canvasContext.lineWidth = 2;
+			canvasContext.strokeStyle = '#3cfd2a';
 
-			canvasCtx.beginPath();
+			canvasContext.beginPath();
 
 			var sliceWidth = WIDTH * 1.0 / bufferLength;
 			var x = 0;
@@ -136,20 +149,20 @@ audioController = (function($) {
 				var y = v * HEIGHT/2;
 
 				if(i === 0) {
-					canvasCtx.moveTo(x, y);
+					canvasContext.moveTo(x, y);
 				} else {
-					canvasCtx.lineTo(x, y);
+					canvasContext.lineTo(x, y);
 				}
 
 				x += sliceWidth;
 			}
 
-			canvasCtx.lineTo(canvas.width, canvas.height/2);
-			canvasCtx.stroke();
+			canvasContext.lineTo(canvas.width, canvas.height/2);
+			canvasContext.stroke();
 		}
 
 		draw();  
-	}	
+	}
 
 	$(onDocumentReady);
 })(jQuery);
